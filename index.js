@@ -8,6 +8,51 @@ app.listen(port, () => {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 //-----------------------------------------------------------
+const reactData = {
+    total: 10,
+    items: [
+        {   strDrink: "155 Belmont",
+            strDrinkThumb: "https://www.thecocktaildb.com/images/media/drink/yqvvqs1475667388.jpg",
+            idDrink: "15346"
+        },
+        {
+            strDrink:"57 Chevy with a White License Plate",
+            strDrinkThumb:"https://www.thecocktaildb.com/images/media/drink/qyyvtu1468878544.jpg",
+            idDrink:"14029"
+        },
+        {   strDrink:"747 Drink",
+            strDrinkThumb:"https://www.thecocktaildb.com/images/media/drink/i9suxb1582474926.jpg",
+            idDrink:"178318"
+        },
+        {   strDrink:"9 1/2 Weeks",
+            strDrinkThumb:"https://www.thecocktaildb.com/images/media/drink/xvwusr1472669302.jpg",
+            idDrink:"16108"
+        },
+        {   strDrink:"A Gilligan's Island",
+            strDrinkThumb:"https://www.thecocktaildb.com/images/media/drink/wysqut1461867176.jpg",
+            idDrink:"16943"
+        },
+        {   strDrink:"A True Amaretto Sour",
+            strDrinkThumb:"https://www.thecocktaildb.com/images/media/drink/rptuxy1472669372.jpg",
+            idDrink:"17005"
+        },
+        {   strDrink:"A.D.M. (After Dinner Mint)",
+            strDrinkThumb:"https://www.thecocktaildb.com/images/media/drink/ruxuvp1472669600.jpg",
+            idDrink:"14560"
+        },
+        {   strDrink:"A1",
+            strDrinkThumb:"https://www.thecocktaildb.com/images/media/drink/2x8thr1504816928.jpg",
+            idDrink:"17222"
+        },
+        {   strDrink: "Abbey Martini",
+            strDrinkThumb:"https://www.thecocktaildb.com/images/media/drink/2mcozt1504817403.jpg",
+            idDrink: "17223"
+        },
+        {   strDrink:"Absolut Summertime",
+            strDrinkThumb:"https://www.thecocktaildb.com/images/media/drink/trpxxs1472669662.jpg",
+            idDrink:"14107"
+        }]
+}
 const dataInfo = [
     {
         id: 1,
@@ -170,40 +215,19 @@ const dataInfo = [
         avatar: 'http://www.avotarov.ru/picture/avatar-64/kartinki/932.jpg'
     }
 ]
-const dataTree = [
-    {
-        id: 1,
-        name: "John",
-        surname: "Fris",
-        phone: "5556194558",
-        items: [
-            {
-                id: 2,
-                name: "Steve",
-                surname: "Jobs",
-                phone: "5557503664"
-            },
-            {
-                id: 3,
-                name: "Ram",
-                surname: "Kapoor",
-                phone: "5554063754"
-            },
-            {
-                id: 4,
-                name: "Bill",
-                surname: "Gates",
-                phone: "5556816585"
-            },
-            {
-                id: 5,
-                name: "Moin",
-                surname: "Khan",
-                phone: "5555875011"
-            }]
-    }
+const dataTree = {
+    1: {name: "John1", surname: "Fris1", phone: "5556194558", parent: 'root', leaf: false},
+    2: {name: "Steve1", surname: "Jobs1", phone: "5557503664", parent: 1, leaf: true},
+    3: {name: "Ram1", surname: "Kapoor1", phone: "5554063754", parent: 1, leaf: true},
+    4: {name: "Bill1", surname: "Gates1", phone: "5556816585", parent: 1, leaf: true},
+    5: {name: "Moin1", surname: "Khan1", phone: "5555875011", parent: 1, leaf: true},
+    6: {name: "John2", surname: "Fris2", phone: "5556194558", parent: 'root', leaf: false},
+    7: {name: "Steve2", surname: "Jobs2", phone: "5557503664", parent: 6, leaf: true},
+    8: {name: "Ram2", surname: "Kapoor2", phone: "5554063754", parent: 6, leaf: true},
+    9: {name: "Bill2", surname: "Gates2", phone: "5556816585", parent: 6, leaf: true},
+    10: {name: "Moin2", surname: "Khan2", phone: "5555875011", parent: 6, leaf: true}
+};
 
-    ]
 /*app.get('node/api/windowStore', (request, response) => {
     const json = {
         total: 20,
@@ -334,13 +358,20 @@ const dataTree = [
     response.send(json);
 });*/
 app.get('/node/api/treeStore', (req, res) => {
-    const page = req.query.page;
-    const limit = req.query.limit;
-    const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
+    const node = req.query.node;
+    const result = [];
+    const keys = Object.keys(dataTree);
+    for (let index = 0; index < keys.length; index++) {
+        const id = keys[index];
+        const row = dataTree[id];
+        row.id = id;
+        if (row.parent == req.query.node) {
+            result.push(row);
+        }
+    }
     res.json({
-        total: dataTree.length,
-        items: dataTree //.slice(startIndex, endIndex)
+        total: result.length,
+        result: result
     });
 });
 app.get('/node/api/newStore', (req, res) => {
@@ -351,6 +382,16 @@ app.get('/node/api/newStore', (req, res) => {
     res.json({
         total: dataInfo.length,
         items: dataInfo.slice(startIndex, endIndex)
+    });
+});
+app.get('/node/api/reactData', (req, res) => {
+    const page = req.query.page;
+    const limit = req.query.limit;
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+    res.json({
+        total: reactData.length,
+        items: reactData
     });
 });
 
